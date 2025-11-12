@@ -12,11 +12,62 @@ import '../screens/contacts/contact_form_screen.dart';
 import '../screens/transactions/transaction_detail_screen.dart';
 import '../screens/account_statement/account_statement_screen.dart';
 import '../screens/settings/settings_screen.dart';
+import '../screens/splash/splash_screen.dart';
+import '../screens/welcome/welcome_screen.dart';
+import '../utils/onboarding_helper.dart';
 import '../database/models/transaction.dart';
 import '../widgets/main_scaffold.dart';
 
+// Flag to track if splash should be shown on app startup
+bool _shouldShowSplashOnStartup = true;
+// Flag to track if we just navigated from splash (to prevent redirect loop)
+bool _justNavigatedFromSplash = false;
+
+// Function to mark that we're navigating from splash screen
+void markNavigatingFromSplash() {
+  _justNavigatedFromSplash = true;
+}
+
 final GoRouter appRouter = GoRouter(
+  initialLocation: '/',
+  redirect: (context, state) async {
+    final isOnboardingComplete = await OnboardingHelper.isOnboardingComplete();
+    final currentPath = state.uri.path;
+
+    // If we just navigated from splash to home, don't redirect back
+    if (_justNavigatedFromSplash && currentPath == '/') {
+      _justNavigatedFromSplash = false;
+      return null; // Allow navigation to home
+    }
+
+    // If onboarding is not complete and not already on welcome screen, redirect to welcome
+    if (!isOnboardingComplete && currentPath != '/welcome') {
+      return '/welcome';
+    }
+
+    // If onboarding is complete and on welcome screen, redirect to splash
+    if (isOnboardingComplete && currentPath == '/welcome') {
+      return '/splash';
+    }
+
+    // On initial app load (root path), show splash if onboarding is complete
+    // Only redirect on the very first navigation to prevent loops
+    if (currentPath == '/' && isOnboardingComplete && _shouldShowSplashOnStartup) {
+      _shouldShowSplashOnStartup = false; // Mark that we've shown it for this session
+      return '/splash';
+    }
+
+    return null; // No redirect needed
+  },
   routes: [
+    GoRoute(
+      path: '/welcome',
+      builder: (context, state) => const WelcomeScreen(),
+    ),
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
     ShellRoute(
       builder: (context, state, child) {
         return MainScaffold(
