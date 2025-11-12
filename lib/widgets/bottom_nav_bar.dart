@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:mycashbook2/l10n/app_localizations.dart';
 
 class CustomBottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -26,28 +27,28 @@ class CustomBottomNavBar extends StatelessWidget {
               _buildNavItem(
                 context,
                 icon: Icons.home_rounded,
-                label: 'Home',
+                label: AppLocalizations.of(context)!.home,
                 index: 0,
                 route: '/',
               ),
               _buildNavItem(
                 context,
                 icon: Icons.receipt_long_rounded,
-                label: 'Reports',
+                label: AppLocalizations.of(context)!.reports,
                 index: 1,
                 route: '/reports',
               ),
               _buildNavItem(
                 context,
                 icon: Icons.account_balance_wallet_rounded,
-                label: 'Accounts',
+                label: AppLocalizations.of(context)!.accounts,
                 index: 2,
                 route: '/accounts',
               ),
               _buildNavItem(
                 context,
                 icon: Icons.contacts_rounded,
-                label: 'Contacts',
+                label: AppLocalizations.of(context)!.contacts,
                 index: 3,
                 route: '/contacts',
               ),

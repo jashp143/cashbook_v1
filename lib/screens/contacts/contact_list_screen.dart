@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mycashbook2/l10n/app_localizations.dart';
 import '../../providers/contact_provider.dart';
 import '../../database/models/contact.dart';
 
@@ -21,20 +23,21 @@ class _ContactListScreenState extends State<ContactListScreen> {
   }
 
   Future<void> _deleteContact(BuildContext context, Contact contact) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Contact'),
-        content: Text('Are you sure you want to delete "${contact.name}"?'),
+        title: Text(l10n.deleteContact),
+        content: Text(l10n.deleteContactConfirmation(contact.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -44,14 +47,16 @@ class _ContactListScreenState extends State<ContactListScreen> {
       try {
         await context.read<ContactProvider>().deleteContact(contact.id!);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Contact deleted')),
+          Fluttertoast.showToast(
+            msg: l10n.contactDeleted,
+            toastLength: Toast.LENGTH_SHORT,
           );
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
+          Fluttertoast.showToast(
+            msg: l10n.error(e.toString()),
+            toastLength: Toast.LENGTH_SHORT,
           );
         }
       }
@@ -70,9 +75,9 @@ class _ContactListScreenState extends State<ContactListScreen> {
       },
       child: Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Contacts',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.contacts,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
       ),
@@ -94,7 +99,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No contacts found',
+                    AppLocalizations.of(context)!.noContactsFound,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
                     ),
@@ -103,7 +108,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
                   TextButton.icon(
                     onPressed: () => context.go('/contacts/new'),
                     icon: const Icon(Icons.add),
-                    label: const Text('Add Contact'),
+                    label: Text(AppLocalizations.of(context)!.addContact),
                   ),
                 ],
               ),
@@ -212,11 +217,11 @@ class _ContactListScreenState extends State<ContactListScreen> {
                             icon: const Icon(Icons.more_vert),
                             itemBuilder: (context) => [
                               PopupMenuItem(
-                                child: const Row(
+                                child: Row(
                                   children: [
-                                    Icon(Icons.edit, size: 20),
-                                    SizedBox(width: 8),
-                                    Text('Edit'),
+                                    const Icon(Icons.edit, size: 20),
+                                    const SizedBox(width: 8),
+                                    Text(AppLocalizations.of(context)!.edit),
                                   ],
                                 ),
                                 onTap: () => Future.delayed(
@@ -225,11 +230,14 @@ class _ContactListScreenState extends State<ContactListScreen> {
                                 ),
                               ),
                               PopupMenuItem(
-                                child: const Row(
+                                child: Row(
                                   children: [
-                                    Icon(Icons.delete, size: 20, color: Colors.red),
-                                    SizedBox(width: 8),
-                                    Text('Delete', style: TextStyle(color: Colors.red)),
+                                    const Icon(Icons.delete, size: 20, color: Colors.red),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      AppLocalizations.of(context)!.delete,
+                                      style: const TextStyle(color: Colors.red),
+                                    ),
                                   ],
                                 ),
                                 onTap: () => Future.delayed(
@@ -252,7 +260,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.go('/contacts/new'),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Add Contact'),
+        label: Text(AppLocalizations.of(context)!.addContact),
       ),
       ),
     );

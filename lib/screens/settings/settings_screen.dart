@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:mycashbook2/l10n/app_localizations.dart';
 import '../../providers/theme_provider.dart';
+import '../../providers/language_provider.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -22,9 +24,9 @@ class SettingsScreen extends StatelessWidget {
             }
           },
         ),
-        title: const Text(
-          'Settings',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.settings,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
       body: ListView(
@@ -53,7 +55,7 @@ class SettingsScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 12),
                     Text(
-                      'Theme',
+                      AppLocalizations.of(context)!.theme,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -67,7 +69,7 @@ class SettingsScreen extends StatelessWidget {
                       children: [
                         _buildThemeOption(
                           context,
-                          title: 'System Theme',
+                          title: AppLocalizations.of(context)!.systemTheme,
                           icon: Icons.brightness_auto_rounded,
                           isSelected: themeProvider.themeMode == ThemeMode.system,
                           onTap: () {
@@ -77,7 +79,7 @@ class SettingsScreen extends StatelessWidget {
                         const SizedBox(height: 12),
                         _buildThemeOption(
                           context,
-                          title: 'Light Mode',
+                          title: AppLocalizations.of(context)!.lightMode,
                           icon: Icons.light_mode_rounded,
                           isSelected: themeProvider.themeMode == ThemeMode.light,
                           onTap: () {
@@ -87,11 +89,83 @@ class SettingsScreen extends StatelessWidget {
                         const SizedBox(height: 12),
                         _buildThemeOption(
                           context,
-                          title: 'Dark Mode',
+                          title: AppLocalizations.of(context)!.darkMode,
                           icon: Icons.dark_mode_rounded,
                           isSelected: themeProvider.themeMode == ThemeMode.dark,
                           onTap: () {
                             themeProvider.setThemeMode(ThemeMode.dark);
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          // Language Selection Section
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: theme.cardColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: theme.dividerColor.withOpacity(0.2),
+                width: 1,
+              ),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.language_rounded,
+                      color: theme.colorScheme.primary,
+                      size: 24,
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      AppLocalizations.of(context)!.language,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Consumer<LanguageProvider>(
+                  builder: (context, languageProvider, child) {
+                    return Column(
+                      children: [
+                        _buildLanguageOption(
+                          context,
+                          title: AppLocalizations.of(context)!.english,
+                          locale: const Locale('en'),
+                          isSelected: languageProvider.locale.languageCode == 'en',
+                          onTap: () {
+                            languageProvider.setLanguage(const Locale('en'));
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        _buildLanguageOption(
+                          context,
+                          title: AppLocalizations.of(context)!.hindi,
+                          locale: const Locale('hi'),
+                          isSelected: languageProvider.locale.languageCode == 'hi',
+                          onTap: () {
+                            languageProvider.setLanguage(const Locale('hi'));
+                          },
+                        ),
+                        const SizedBox(height: 12),
+                        _buildLanguageOption(
+                          context,
+                          title: AppLocalizations.of(context)!.gujarati,
+                          locale: const Locale('gu'),
+                          isSelected: languageProvider.locale.languageCode == 'gu',
+                          onTap: () {
+                            languageProvider.setLanguage(const Locale('gu'));
                           },
                         ),
                       ],
@@ -138,6 +212,67 @@ class SettingsScreen extends StatelessWidget {
           children: [
             Icon(
               icon,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : theme.textTheme.bodyMedium?.color,
+              size: 24,
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.textTheme.bodyMedium?.color,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                Icons.check_circle_rounded,
+                color: theme.colorScheme.primary,
+                size: 24,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageOption(
+    BuildContext context, {
+    required String title,
+    required Locale locale,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    final theme = Theme.of(context);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? theme.colorScheme.primary.withOpacity(0.1)
+              : theme.brightness == Brightness.dark
+                  ? Colors.white.withOpacity(0.05)
+                  : Colors.black.withOpacity(0.05),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected
+                ? theme.colorScheme.primary
+                : theme.dividerColor.withOpacity(0.2),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              Icons.language_rounded,
               color: isSelected
                   ? theme.colorScheme.primary
                   : theme.textTheme.bodyMedium?.color,

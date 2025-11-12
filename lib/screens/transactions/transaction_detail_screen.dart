@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../database/models/transaction.dart';
 import '../../providers/account_provider.dart';
 import '../../providers/contact_provider.dart';
+import '../../providers/transaction_provider.dart';
 import '../../utils/whatsapp_share.dart';
+import '../../l10n/app_localizations.dart';
 
 class TransactionDetailScreen extends StatefulWidget {
   final Transaction transaction;
@@ -47,6 +50,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
         ? contactProvider.getContactById(transaction.contactId)?.name ?? 'N/A'
         : 'N/A';
 
+    final l10n = AppLocalizations.of(context)!;
     Color amountColor;
     IconData typeIcon;
     String typeLabel;
@@ -55,17 +59,17 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
     if (transaction.type == 'income') {
       amountColor = Colors.green;
       typeIcon = Icons.arrow_downward_rounded;
-      typeLabel = 'Income';
+      typeLabel = l10n.income;
       backgroundColor = Colors.green;
     } else if (transaction.type == 'expense') {
       amountColor = Colors.red;
       typeIcon = Icons.arrow_upward_rounded;
-      typeLabel = 'Expense';
+      typeLabel = l10n.expense;
       backgroundColor = Colors.red;
     } else {
       amountColor = Colors.blue;
       typeIcon = Icons.swap_horiz_rounded;
-      typeLabel = 'Transfer';
+      typeLabel = l10n.transfer;
       backgroundColor = Colors.blue;
     }
 
@@ -92,16 +96,46 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Transaction Details',
-            style: TextStyle(fontWeight: FontWeight.bold),
+          title: Builder(
+            builder: (context) {
+              final l10n = AppLocalizations.of(context)!;
+              return Text(
+                l10n.transactionDetails,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              );
+            },
           ),
           elevation: 0,
           actions: [
-            IconButton(
-              icon: const Icon(Icons.share),
-              onPressed: () => _shareViaWhatsApp(context),
-              tooltip: 'Share via WhatsApp',
+            Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => _editTransaction(context),
+                  tooltip: l10n.editTransaction,
+                );
+              },
+            ),
+            Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () => _deleteTransaction(context),
+                  tooltip: l10n.deleteTransaction,
+                );
+              },
+            ),
+            Builder(
+              builder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return IconButton(
+                  icon: const Icon(Icons.share),
+                  onPressed: () => _shareViaWhatsApp(context),
+                  tooltip: l10n.shareViaWhatsApp,
+                );
+              },
             ),
           ],
         ),
@@ -166,7 +200,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Transaction Details',
+                    l10n.transactionDetails,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
@@ -178,7 +212,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                   _buildDetailCard(
                     context,
                     icon: Icons.calendar_today_rounded,
-                    label: 'Date',
+                    label: l10n.date,
                     value: formattedDate,
                   ),
                   
@@ -189,7 +223,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     _buildDetailCard(
                       context,
                       icon: Icons.account_balance_wallet_rounded,
-                      label: transaction.type == 'transfer' ? 'From Account' : 'Account',
+                      label: transaction.type == 'transfer' ? l10n.fromAccount : l10n.account,
                       value: accountName,
                     ),
                   
@@ -199,7 +233,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     _buildDetailCard(
                       context,
                       icon: Icons.account_balance_wallet_outlined,
-                      label: 'To Account',
+                      label: l10n.toAccount,
                       value: secondAccountName,
                     ),
                   ],
@@ -210,7 +244,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     _buildDetailCard(
                       context,
                       icon: Icons.person_rounded,
-                      label: 'Contact',
+                      label: l10n.contact,
                       value: contactName,
                     ),
                   ],
@@ -221,7 +255,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     _buildDetailCard(
                       context,
                       icon: Icons.receipt_rounded,
-                      label: 'Bill Number',
+                      label: l10n.billNumber,
                       value: transaction.billNumber!,
                     ),
                   ],
@@ -232,7 +266,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     _buildDetailCard(
                       context,
                       icon: Icons.business_rounded,
-                      label: 'Company',
+                      label: l10n.company,
                       value: transaction.companyName!,
                     ),
                   ],
@@ -243,13 +277,49 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
                     _buildDetailCard(
                       context,
                       icon: Icons.note_rounded,
-                      label: 'Remark',
+                      label: l10n.remark,
                       value: transaction.remark!,
                       isMultiline: true,
                     ),
                   ],
                   
                   const SizedBox(height: 24),
+                  
+                  // Action Buttons
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _editTransaction(context),
+                          icon: const Icon(Icons.edit, size: 20),
+                          label: Text(l10n.edit),
+                          style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () => _deleteTransaction(context),
+                          icon: const Icon(Icons.delete, size: 20),
+                          label: Text(l10n.delete),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.red,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  
+                  const SizedBox(height: 16),
                   
                   // Share Button
                   _buildShareButton(context),
@@ -332,6 +402,79 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
     );
   }
 
+  Future<void> _editTransaction(BuildContext context) async {
+    final transaction = widget.transaction;
+    
+    // Navigate to the appropriate form screen based on transaction type
+    String route;
+    if (transaction.type == 'income') {
+      route = '/income';
+    } else if (transaction.type == 'expense') {
+      route = '/expense';
+    } else {
+      route = '/transfer';
+    }
+    
+    // Navigate with transaction as extra data for editing
+    context.go(route, extra: transaction);
+  }
+
+  Future<void> _deleteTransaction(BuildContext context) async {
+    final transaction = widget.transaction;
+    final l10n = AppLocalizations.of(context)!;
+    
+    // Show confirmation dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.deleteTransaction),
+        content: Text(
+          l10n.deleteTransactionConfirmation(transaction.type, transaction.amount.toStringAsFixed(0)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.red,
+            ),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && transaction.id != null) {
+      try {
+        final transactionProvider = context.read<TransactionProvider>();
+        final accountProvider = context.read<AccountProvider>();
+        
+        await transactionProvider.deleteTransaction(
+          transaction.id!,
+          accountProvider,
+        );
+
+        if (mounted) {
+          Fluttertoast.showToast(
+            msg: l10n.transactionDeletedSuccessfully,
+            toastLength: Toast.LENGTH_SHORT,
+          );
+          context.go('/');
+        }
+      } catch (e) {
+        if (mounted) {
+          Fluttertoast.showToast(
+            msg: l10n.errorDeletingTransaction(e.toString()),
+            toastLength: Toast.LENGTH_SHORT,
+          );
+        }
+      }
+    }
+  }
+
   Future<void> _shareViaWhatsApp(BuildContext context) async {
     final accountProvider = context.read<AccountProvider>();
     final contactProvider = context.read<ContactProvider>();
@@ -347,48 +490,49 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
 
     // If phone number exists, ask user how they want to share
     if (phoneNumber != null && phoneNumber.isNotEmpty) {
+      final l10n = AppLocalizations.of(context)!;
       final shareOption = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Share via WhatsApp'),
+          title: Text(l10n.shareViaWhatsApp),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (contactName != null) ...[
-                Text('Contact: $contactName'),
+                Text('${l10n.contact}: $contactName'),
                 const SizedBox(height: 8),
               ],
-              Text('Phone: $phoneNumber'),
+              Text('${l10n.phone}: $phoneNumber'),
               const SizedBox(height: 16),
-              const Text(
-                'Choose how to share:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                l10n.chooseHowToShare,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text(
-                '• With phone number: Opens chat directly (if number is on WhatsApp)',
-                style: TextStyle(fontSize: 12),
+              Text(
+                l10n.withPhoneNumberDescription,
+                style: const TextStyle(fontSize: 12),
               ),
               const SizedBox(height: 4),
-              const Text(
-                '• Without phone number: Opens WhatsApp, you can select the contact',
-                style: TextStyle(fontSize: 12),
+              Text(
+                l10n.withoutPhoneNumberDescription,
+                style: const TextStyle(fontSize: 12),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop('with_number'),
-              child: const Text('With Phone Number'),
+              child: Text(l10n.withPhoneNumber),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop('without_number'),
-              child: const Text('Without Phone Number'),
+              child: Text(l10n.withoutPhoneNumber),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(null),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
           ],
         ),
@@ -410,28 +554,23 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
       phoneNumber: phoneNumber,
     );
 
+    final l10n = AppLocalizations.of(context)!;
     if (!success && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not open WhatsApp. Please make sure WhatsApp is installed.'),
-          duration: Duration(seconds: 2),
-        ),
+      Fluttertoast.showToast(
+        msg: l10n.couldNotOpenWhatsApp,
+        toastLength: Toast.LENGTH_SHORT,
       );
     } else if (success && phoneNumber != null && context.mounted) {
       // Show a helpful message if sharing with phone number
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'If WhatsApp says the number isn\'t registered, try sharing without phone number option.',
-          ),
-          duration: Duration(seconds: 3),
-        ),
+      Fluttertoast.showToast(
+        msg: l10n.whatsAppNotRegisteredMessage,
+        toastLength: Toast.LENGTH_LONG,
       );
     }
   }
 
   Widget _buildShareButton(BuildContext context) {
-    final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     
     return Container(
       width: double.infinity,
@@ -439,7 +578,7 @@ class _TransactionDetailScreenState extends State<TransactionDetailScreen> {
       child: ElevatedButton.icon(
         onPressed: () => _shareViaWhatsApp(context),
         icon: const Icon(Icons.message, size: 20),
-        label: const Text('Share via WhatsApp'),
+        label: Text(l10n.shareViaWhatsApp),
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFF25D366), // WhatsApp green
           foregroundColor: Colors.white,

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mycashbook2/l10n/app_localizations.dart';
 import '../../providers/account_provider.dart';
 import '../../database/models/account.dart';
 
@@ -15,6 +17,8 @@ class AccountFormScreen extends StatefulWidget {
 class _AccountFormScreenState extends State<AccountFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
+  final _accountNumberController = TextEditingController();
+  final _noteController = TextEditingController();
   bool _isLoading = false;
   Account? _existingAccount;
 
@@ -36,6 +40,8 @@ class _AccountFormScreenState extends State<AccountFormScreen> {
       setState(() {
         _existingAccount = account;
         _nameController.text = account.name;
+        _accountNumberController.text = account.accountNumber ?? '';
+        _noteController.text = account.note ?? '';
       });
     }
   }
@@ -43,6 +49,8 @@ class _AccountFormScreenState extends State<AccountFormScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _accountNumberController.dispose();
+    _noteController.dispose();
     super.dispose();
   }
 
@@ -61,6 +69,12 @@ class _AccountFormScreenState extends State<AccountFormScreen> {
         id: _existingAccount?.id,
         name: _nameController.text.trim(),
         balance: _existingAccount?.balance ?? 0.0,
+        accountNumber: _accountNumberController.text.trim().isEmpty
+            ? null
+            : _accountNumberController.text.trim(),
+        note: _noteController.text.trim().isEmpty
+            ? null
+            : _noteController.text.trim(),
         createdAt: _existingAccount?.createdAt ?? now,
       );
 
@@ -71,19 +85,20 @@ class _AccountFormScreenState extends State<AccountFormScreen> {
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(_existingAccount == null
-                ? 'Account created'
-                : 'Account updated'),
-          ),
+        final l10n = AppLocalizations.of(context)!;
+        Fluttertoast.showToast(
+          msg: _existingAccount == null
+              ? l10n.accountCreated
+              : l10n.accountUpdated,
+          toastLength: Toast.LENGTH_SHORT,
         );
         context.go('/accounts');
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+        Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.error(e.toString()),
+          toastLength: Toast.LENGTH_SHORT,
         );
       }
     } finally {
@@ -106,7 +121,9 @@ class _AccountFormScreenState extends State<AccountFormScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text(_existingAccount == null ? 'New Account' : 'Edit Account'),
+          title: Text(_existingAccount == null 
+              ? AppLocalizations.of(context)!.newAccount 
+              : AppLocalizations.of(context)!.editAccount),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_rounded),
             onPressed: () => context.go('/accounts'),
@@ -119,16 +136,35 @@ class _AccountFormScreenState extends State<AccountFormScreen> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Account Name',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.accountName,
+                border: const OutlineInputBorder(),
               ),
               validator: (value) {
                 if (value == null || value.trim().isEmpty) {
-                  return 'Please enter account name';
+                  return AppLocalizations.of(context)!.pleaseEnterAccountName;
                 }
                 return null;
               },
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _accountNumberController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.accountNumberOptional,
+                border: const OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.text,
+            ),
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _noteController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.of(context)!.noteOptional,
+                border: const OutlineInputBorder(),
+              ),
+              keyboardType: TextInputType.multiline,
+              maxLines: 3,
             ),
             const SizedBox(height: 32),
             ElevatedButton(
@@ -138,7 +174,7 @@ class _AccountFormScreenState extends State<AccountFormScreen> {
               ),
               child: _isLoading
                   ? const CircularProgressIndicator()
-                  : const Text('Save Account'),
+                  : Text(AppLocalizations.of(context)!.saveAccount),
             ),
           ],
         ),

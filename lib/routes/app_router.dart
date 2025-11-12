@@ -45,15 +45,24 @@ final GoRouter appRouter = GoRouter(
     ),
     GoRoute(
       path: '/income',
-      builder: (context, state) => const IncomeFormScreen(),
+      builder: (context, state) {
+        final transaction = state.extra as Transaction?;
+        return IncomeFormScreen(transactionToEdit: transaction);
+      },
     ),
     GoRoute(
       path: '/expense',
-      builder: (context, state) => const ExpenseFormScreen(),
+      builder: (context, state) {
+        final transaction = state.extra as Transaction?;
+        return ExpenseFormScreen(transactionToEdit: transaction);
+      },
     ),
     GoRoute(
       path: '/transfer',
-      builder: (context, state) => const TransferFormScreen(),
+      builder: (context, state) {
+        final transaction = state.extra as Transaction?;
+        return TransferFormScreen(transactionToEdit: transaction);
+      },
     ),
     GoRoute(
       path: '/accounts/new',
@@ -80,7 +89,6 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/transaction/:id',
       builder: (context, state) {
-        final transactionId = state.pathParameters['id'];
         final transaction = state.extra as Transaction?;
         if (transaction != null) {
           return TransactionDetailScreen(transaction: transaction);

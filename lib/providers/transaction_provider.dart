@@ -163,9 +163,92 @@ class TransactionProvider with ChangeNotifier {
     }
   }
 
-  Future<void> updateTransaction(Transaction transaction) async {
+  Future<void> _revertAccountBalances(
+    Transaction transaction,
+    AccountProvider accountProvider,
+  ) async {
+    // Revert the effect of a transaction on account balances
+    if (transaction.type == 'income' && transaction.accountId != null) {
+      final account = accountProvider.getAccountById(transaction.accountId);
+      if (account != null) {
+        final newBalance = account.balance - transaction.amount;
+        await accountProvider.updateAccountBalance(
+          transaction.accountId!,
+          newBalance,
+        );
+      }
+    } else if (transaction.type == 'expense' && transaction.accountId != null) {
+      final account = accountProvider.getAccountById(transaction.accountId);
+      if (account != null) {
+        final newBalance = account.balance + transaction.amount;
+        await accountProvider.updateAccountBalance(
+          transaction.accountId!,
+          newBalance,
+        );
+      }
+    } else if (transaction.type == 'transfer') {
+      // For transfer: revert by crediting from account, debiting to secondAccount
+      if (transaction.accountId != null) {
+        final fromAccount = accountProvider.getAccountById(transaction.accountId);
+        if (fromAccount != null) {
+          final newBalance = fromAccount.balance + transaction.amount;
+          await accountProvider.updateAccountBalance(
+            transaction.accountId!,
+            newBalance,
+          );
+        }
+      }
+      if (transaction.secondAccountId != null) {
+        final toAccount = accountProvider.getAccountById(transaction.secondAccountId);
+        if (toAccount != null) {
+          final newBalance = toAccount.balance - transaction.amount;
+          await accountProvider.updateAccountBalance(
+            transaction.secondAccountId!,
+            newBalance,
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> updateTransaction(
+    Transaction transaction,
+    List<Receipt>? receipts,
+    AccountProvider accountProvider,
+  ) async {
     try {
+      if (transaction.id == null) {
+        throw Exception('Transaction ID is required for update');
+      }
+
+      // Get the old transaction to revert its balance effects
+      final oldTransaction = await _db.getTransaction(transaction.id!);
+      if (oldTransaction == null) {
+        throw Exception('Transaction not found');
+      }
+
+      // Revert old transaction's effect on account balances
+      await _revertAccountBalances(oldTransaction, accountProvider);
+
+      // Update transaction in database
       await _db.updateTransaction(transaction);
+
+      // Delete old receipts
+      await _db.deleteReceiptsByTransaction(transaction.id!);
+
+      // Insert new receipts if any
+      if (receipts != null && receipts.isNotEmpty) {
+        for (var receipt in receipts) {
+          await _db.insertReceipt(
+            receipt.copyWith(transactionId: transaction.id!),
+          );
+        }
+      }
+
+      // Apply new transaction's effect on account balances
+      await _updateAccountBalances(transaction, accountProvider);
+
+      // Reload transactions
       await loadTransactions();
     } catch (e) {
       debugPrint('Error updating transaction: $e');
@@ -173,12 +256,27 @@ class TransactionProvider with ChangeNotifier {
     }
   }
 
-  Future<void> deleteTransaction(int id) async {
+  Future<void> deleteTransaction(
+    int id,
+    AccountProvider accountProvider,
+  ) async {
     try {
+      // Get the transaction to revert its balance effects
+      final transaction = await _db.getTransaction(id);
+      if (transaction == null) {
+        throw Exception('Transaction not found');
+      }
+
+      // Revert transaction's effect on account balances
+      await _revertAccountBalances(transaction, accountProvider);
+
       // Delete associated receipts
       await _db.deleteReceiptsByTransaction(id);
+      
       // Delete transaction
       await _db.deleteTransaction(id);
+      
+      // Reload transactions
       await loadTransactions();
     } catch (e) {
       debugPrint('Error deleting transaction: $e');

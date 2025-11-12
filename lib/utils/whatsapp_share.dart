@@ -30,20 +30,6 @@ class WhatsAppShare {
       // Keep original format
     }
 
-    // Determine transaction type label
-    String typeLabel;
-    String typeEmoji;
-    if (transaction.type == 'income') {
-      typeLabel = 'Income';
-      typeEmoji = '💰';
-    } else if (transaction.type == 'expense') {
-      typeLabel = 'Expense';
-      typeEmoji = '💸';
-    } else {
-      typeLabel = 'Transfer';
-      typeEmoji = '🔄';
-    }
-
     // Build professional message based on transaction type
     final buffer = StringBuffer();
     

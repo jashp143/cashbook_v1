@@ -4,6 +4,7 @@ import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../providers/account_provider.dart';
 import '../../providers/contact_provider.dart';
 import '../../providers/transaction_provider.dart';
@@ -12,6 +13,7 @@ import '../../widgets/date_filter_chip.dart';
 import '../../utils/pdf_export.dart';
 import '../../utils/excel_export.dart';
 import '../../utils/date_formatter.dart';
+import '../../l10n/app_localizations.dart';
 
 enum ViewMode { timeline, calendar }
 
@@ -116,13 +118,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
           ? contactProvider.getContactById(_selectedContactId)?.name
           : null;
 
+      final l10n = AppLocalizations.of(context)!;
       String dateRange;
       if (_selectedDateFilter == DateFilterType.today) {
-        dateRange = 'Today';
+        dateRange = l10n.today;
       } else if (_selectedDateFilter == DateFilterType.weekly) {
-        dateRange = 'This Week';
+        dateRange = l10n.thisWeek;
       } else if (_selectedDateFilter == DateFilterType.monthly) {
-        dateRange = 'This Month';
+        dateRange = l10n.thisMonth;
       } else if (_selectedDateFilter == DateFilterType.custom &&
           _customStartDate != null &&
           _customEndDate != null) {
@@ -131,7 +134,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           _customEndDate!,
         );
       } else {
-        dateRange = 'All Time';
+        dateRange = l10n.allTime;
       }
 
       final file = await PDFExport.generateTransactionReport(
@@ -143,11 +146,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
         dateRange: dateRange,
       );
 
-      await Share.shareXFiles([XFile(file.path)], text: 'Transaction Report');
+      await Share.shareXFiles([XFile(file.path)], text: l10n.transactionReport);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error exporting PDF: $e')),
+        final l10n = AppLocalizations.of(context)!;
+        Fluttertoast.showToast(
+          msg: l10n.errorExportingPDF(e.toString()),
+          toastLength: Toast.LENGTH_SHORT,
         );
       }
     } finally {
@@ -176,13 +181,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
           ? contactProvider.getContactById(_selectedContactId)?.name
           : null;
 
+      final l10n = AppLocalizations.of(context)!;
       String dateRange;
       if (_selectedDateFilter == DateFilterType.today) {
-        dateRange = 'Today';
+        dateRange = l10n.today;
       } else if (_selectedDateFilter == DateFilterType.weekly) {
-        dateRange = 'This Week';
+        dateRange = l10n.thisWeek;
       } else if (_selectedDateFilter == DateFilterType.monthly) {
-        dateRange = 'This Month';
+        dateRange = l10n.thisMonth;
       } else if (_selectedDateFilter == DateFilterType.custom &&
           _customStartDate != null &&
           _customEndDate != null) {
@@ -191,7 +197,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           _customEndDate!,
         );
       } else {
-        dateRange = 'All Time';
+        dateRange = l10n.allTime;
       }
 
       final file = await ExcelExport.generateTransactionReport(
@@ -203,11 +209,13 @@ class _ReportsScreenState extends State<ReportsScreen> {
         dateRange: dateRange,
       );
 
-      await Share.shareXFiles([XFile(file.path)], text: 'Transaction Report');
+      await Share.shareXFiles([XFile(file.path)], text: l10n.transactionReport);
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error exporting Excel: $e')),
+        final l10n = AppLocalizations.of(context)!;
+        Fluttertoast.showToast(
+          msg: l10n.errorExportingExcel(e.toString()),
+          toastLength: Toast.LENGTH_SHORT,
         );
       }
     } finally {
@@ -231,9 +239,14 @@ class _ReportsScreenState extends State<ReportsScreen> {
       },
       child: Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Reports',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Builder(
+          builder: (context) {
+            final l10n = AppLocalizations.of(context)!;
+            return Text(
+              l10n.reports,
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            );
+          },
         ),
         elevation: 0,
         actions: [
@@ -248,28 +261,31 @@ class _ReportsScreenState extends State<ReportsScreen> {
             )
           else
             PopupMenuButton(
-              itemBuilder: (context) => [
-                const PopupMenuItem(
-                  value: 'pdf',
-                  child: Row(
-                    children: [
-                      Icon(Icons.picture_as_pdf),
-                      SizedBox(width: 8),
-                      Text('Export PDF'),
-                    ],
+              itemBuilder: (context) {
+                final l10n = AppLocalizations.of(context)!;
+                return [
+                  PopupMenuItem(
+                    value: 'pdf',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.picture_as_pdf),
+                        const SizedBox(width: 8),
+                        Text(l10n.exportPDF),
+                      ],
+                    ),
                   ),
-                ),
-                const PopupMenuItem(
-                  value: 'excel',
-                  child: Row(
-                    children: [
-                      Icon(Icons.table_chart),
-                      SizedBox(width: 8),
-                      Text('Export Excel'),
-                    ],
+                  PopupMenuItem(
+                    value: 'excel',
+                    child: Row(
+                      children: [
+                        const Icon(Icons.table_chart),
+                        const SizedBox(width: 8),
+                        Text(l10n.exportExcel),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ];
+              },
               onSelected: (value) {
                 if (value == 'pdf') {
                   _exportPDF();
@@ -316,7 +332,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         Expanded(
                           child: _buildSummaryItem(
                             context,
-                            'Income',
+                            AppLocalizations.of(context)!.income,
                             totalIncome,
                             Colors.green,
                             Icons.arrow_downward,
@@ -326,7 +342,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         Expanded(
                           child: _buildSummaryItem(
                             context,
-                            'Expense',
+                            AppLocalizations.of(context)!.expense,
                             totalExpense,
                             Colors.red,
                             Icons.arrow_upward,
@@ -336,7 +352,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         Expanded(
                           child: _buildSummaryItem(
                             context,
-                            'Net',
+                            AppLocalizations.of(context)!.net,
                             netAmount,
                             netAmount >= 0 ? Colors.blue : Colors.orange,
                             Icons.account_balance_wallet,
@@ -352,7 +368,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           child: _buildCompactFilter(
                             context,
                             icon: Icons.filter_list,
-                            label: 'Filters',
+                            label: AppLocalizations.of(context)!.filters,
                             onTap: () => setState(() => _filtersExpanded = !_filtersExpanded),
                             isActive: _selectedAccountId != null || 
                                      _selectedContactId != null || 
@@ -364,7 +380,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           child: _buildViewToggleButton(
                             context,
                             icon: Icons.timeline_rounded,
-                            label: 'Timeline',
+                            label: AppLocalizations.of(context)!.timeline,
                             isSelected: _viewMode == ViewMode.timeline,
                             onTap: () => setState(() => _viewMode = ViewMode.timeline),
                           ),
@@ -374,7 +390,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                           child: _buildViewToggleButton(
                             context,
                             icon: Icons.calendar_today_rounded,
-                            label: 'Calendar',
+                            label: AppLocalizations.of(context)!.calendar,
                             isSelected: _viewMode == ViewMode.calendar,
                             onTap: () => setState(() => _viewMode = ViewMode.calendar),
                           ),
@@ -410,16 +426,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
                               value: _selectedAccountId,
                               isDense: true,
                               decoration: InputDecoration(
-                                labelText: 'Account',
+                                labelText: AppLocalizations.of(context)!.account,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                               ),
                               items: [
-                                const DropdownMenuItem<int>(
+                                DropdownMenuItem<int>(
                                   value: null,
-                                  child: Text('All Accounts', style: TextStyle(fontSize: 14)),
+                                  child: Text(AppLocalizations.of(context)!.allAccounts, style: const TextStyle(fontSize: 14)),
                                 ),
                                 ...accountProvider.accounts.map((account) {
                                   return DropdownMenuItem<int>(
@@ -446,16 +462,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
                               value: _selectedContactId,
                               isDense: true,
                               decoration: InputDecoration(
-                                labelText: 'Contact',
+                                labelText: AppLocalizations.of(context)!.contact,
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                               ),
                               items: [
-                                const DropdownMenuItem<int>(
+                                DropdownMenuItem<int>(
                                   value: null,
-                                  child: Text('All Contacts', style: TextStyle(fontSize: 14)),
+                                  child: Text(AppLocalizations.of(context)!.allContacts, style: const TextStyle(fontSize: 14)),
                                 ),
                                 ...contactProvider.contacts.map((contact) {
                                   return DropdownMenuItem<int>(
@@ -527,7 +543,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No transactions found',
+                          AppLocalizations.of(context)!.noTransactionsFound,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
                           ),
@@ -661,19 +677,20 @@ class _ReportsScreenState extends State<ReportsScreen> {
 
     Color amountColor;
     IconData typeIcon;
+    final l10n = AppLocalizations.of(context);
     String typeLabel;
     if (transaction.type == 'income') {
       amountColor = Colors.green;
       typeIcon = Icons.arrow_downward;
-      typeLabel = 'Income';
+      typeLabel = l10n?.income ?? 'Income';
     } else if (transaction.type == 'expense') {
       amountColor = Colors.red;
       typeIcon = Icons.arrow_upward;
-      typeLabel = 'Expense';
+      typeLabel = l10n?.expense ?? 'Expense';
     } else {
       amountColor = Colors.blue;
       typeIcon = Icons.swap_horiz;
-      typeLabel = 'Transfer';
+      typeLabel = l10n?.transfer ?? 'Transfer';
     }
 
     final theme = Theme.of(context);
@@ -683,8 +700,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
     try {
       final date = DateFormat('yyyy-MM-dd').parse(transaction.date);
       final now = DateTime.now();
+      final l10n = AppLocalizations.of(context);
       if (date.year == now.year && date.month == now.month && date.day == now.day) {
-        dateDisplay = 'Today';
+        dateDisplay = l10n?.today ?? 'Today';
       } else {
         dateDisplay = DateFormat('MMM dd').format(date);
       }
@@ -946,7 +964,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
               child: Row(
                 children: [
                   Text(
-                    _formatDateHeader(date),
+                    _formatDateHeader(context, date),
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
@@ -996,7 +1014,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         borderRadius: BorderRadius.circular(5),
                       ),
                       child: Text(
-                        'Net: ₹${dailyNet.abs().toStringAsFixed(0)}',
+                        AppLocalizations.of(context)!.netLabel(dailyNet.abs().toStringAsFixed(0)),
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: dailyNet >= 0 ? Colors.blue : Colors.orange,
                           fontSize: 12,
@@ -1094,10 +1112,12 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         size: 20,
                       ),
                       label: Text(
-                        _calendarExpanded ? 'Hide Calendar' : 'Show Calendar',
+                        _calendarExpanded 
+                            ? AppLocalizations.of(context)!.hideCalendar 
+                            : AppLocalizations.of(context)!.showCalendar,
                         style: theme.textTheme.bodySmall?.copyWith(
                           fontSize: 12,
-              ),
+                        ),
                       ),
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
@@ -1139,14 +1159,16 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       ),
                       const SizedBox(height: 24),
                       Text(
-                        'No transactions',
+                        AppLocalizations.of(context)!.noTransactions,
                         style: theme.textTheme.titleLarge?.copyWith(
                           fontWeight: FontWeight.w600,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'No transactions on ${DateFormat('MMM dd, yyyy').format(_selectedDay)}',
+                        AppLocalizations.of(context)!.noTransactionsOnDate(
+                          DateFormat('MMM dd, yyyy').format(_selectedDay),
+                        ),
                         style: theme.textTheme.bodyMedium?.copyWith(
                           color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
                         ),
@@ -1235,7 +1257,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${transactionCount} transaction${transactionCount != 1 ? 's' : ''}',
+                          transactionCount == 1
+                              ? AppLocalizations.of(context)!.transactionCount(transactionCount)
+                              : AppLocalizations.of(context)!.transactionCountPlural(transactionCount),
                           style: theme.textTheme.bodySmall?.copyWith(
                             fontSize: 12,
                             color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
@@ -1268,7 +1292,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 if (dayIncome > 0)
                   _buildQuickSummaryItem(
                     theme,
-                    'Income',
+                    AppLocalizations.of(context)!.income,
                     dayIncome,
                     Colors.green,
                     Icons.arrow_downward,
@@ -1276,7 +1300,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 if (dayExpense > 0)
                   _buildQuickSummaryItem(
                     theme,
-                    'Expense',
+                    AppLocalizations.of(context)!.expense,
                     dayExpense,
                     Colors.red,
                     Icons.arrow_upward,
@@ -1284,7 +1308,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 if (dayNet != 0)
                   _buildQuickSummaryItem(
                     theme,
-                    'Net',
+                    AppLocalizations.of(context)!.net,
                     dayNet,
                     dayNet >= 0 ? Colors.blue : Colors.orange,
                     Icons.account_balance_wallet,
@@ -1407,7 +1431,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  String _formatDateHeader(String dateStr) {
+  String _formatDateHeader(BuildContext context, String dateStr) {
     try {
       final date = DateFormat('yyyy-MM-dd').parse(dateStr);
       final today = DateTime.now();
@@ -1418,10 +1442,11 @@ class _ReportsScreenState extends State<ReportsScreen> {
         return a.year == b.year && a.month == b.month && a.day == b.day;
       }
       
+      final l10n = AppLocalizations.of(context);
       if (isSameDay(date, today)) {
-        return 'Today';
+        return l10n?.today ?? 'Today';
       } else if (isSameDay(date, yesterday)) {
-        return 'Yesterday';
+        return l10n?.yesterday ?? 'Yesterday';
       } else {
         // Use compact format: "Mon 15" or "Mon 15, 2024" if different year
         final now = DateTime.now();

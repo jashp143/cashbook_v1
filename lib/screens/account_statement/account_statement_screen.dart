@@ -3,10 +3,11 @@ import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mycashbook2/l10n/app_localizations.dart';
 import '../../providers/account_provider.dart';
 import '../../providers/contact_provider.dart';
 import '../../providers/transaction_provider.dart';
-import '../../database/models/account.dart';
 import '../../database/models/transaction.dart';
 import '../../utils/pdf_export.dart';
 import '../../utils/excel_export.dart';
@@ -101,8 +102,9 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
 
   Future<void> _exportPDF() async {
     if (_selectedAccountId == null || _startDate == null || _endDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select account and date range')),
+      Fluttertoast.showToast(
+        msg: AppLocalizations.of(context)!.pleaseSelectAccountAndDateRange,
+        toastLength: Toast.LENGTH_SHORT,
       );
       return;
     }
@@ -134,14 +136,16 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
       await Share.shareXFiles([XFile(file.path)], text: 'Account Statement - ${account.name}');
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('PDF exported successfully')),
+        Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.pdfExportedSuccessfully,
+          toastLength: Toast.LENGTH_SHORT,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error exporting PDF: $e')),
+        Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.errorExportingPDF(e.toString()),
+          toastLength: Toast.LENGTH_SHORT,
         );
       }
     } finally {
@@ -155,8 +159,9 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
 
   Future<void> _exportExcel() async {
     if (_selectedAccountId == null || _startDate == null || _endDate == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select account and date range')),
+      Fluttertoast.showToast(
+        msg: AppLocalizations.of(context)!.pleaseSelectAccountAndDateRange,
+        toastLength: Toast.LENGTH_SHORT,
       );
       return;
     }
@@ -188,14 +193,16 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
       await Share.shareXFiles([XFile(file.path)], text: 'Account Statement - ${account.name}');
       
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Excel exported successfully')),
+        Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.excelExportedSuccessfully,
+          toastLength: Toast.LENGTH_SHORT,
         );
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error exporting Excel: $e')),
+        Fluttertoast.showToast(
+          msg: AppLocalizations.of(context)!.errorExportingExcel(e.toString()),
+          toastLength: Toast.LENGTH_SHORT,
         );
       }
     } finally {
@@ -224,9 +231,9 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text(
-            'Account Statement',
-            style: TextStyle(fontWeight: FontWeight.bold),
+          title: Text(
+            AppLocalizations.of(context)!.accountStatement,
+            style: const TextStyle(fontWeight: FontWeight.bold),
           ),
           elevation: 0,
           leading: IconButton(
@@ -263,7 +270,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                     return DropdownButtonFormField<int>(
                       value: _selectedAccountId,
                       decoration: InputDecoration(
-                        labelText: 'Select Account',
+                        labelText: AppLocalizations.of(context)!.selectAccount,
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
@@ -311,7 +318,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'Start Date',
+                                      AppLocalizations.of(context)!.startDate,
                                       style: theme.textTheme.bodySmall?.copyWith(
                                         fontSize: 12,
                                       ),
@@ -320,7 +327,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                                     Text(
                                       _startDate != null
                                           ? DateFormat('MMM dd, yyyy').format(_startDate!)
-                                          : 'Select date',
+                                          : AppLocalizations.of(context)!.selectDate,
                                       style: theme.textTheme.bodyMedium?.copyWith(
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -357,7 +364,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      'End Date',
+                                      AppLocalizations.of(context)!.endDate,
                                       style: theme.textTheme.bodySmall?.copyWith(
                                         fontSize: 12,
                                       ),
@@ -366,7 +373,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                                     Text(
                                       _endDate != null
                                           ? DateFormat('MMM dd, yyyy').format(_endDate!)
-                                          : 'Select date',
+                                          : AppLocalizations.of(context)!.selectDate,
                                       style: theme.textTheme.bodyMedium?.copyWith(
                                         fontWeight: FontWeight.w500,
                                       ),
@@ -395,7 +402,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.picture_as_pdf),
-                        label: const Text('Export PDF'),
+                        label: Text(AppLocalizations.of(context)!.exportPDF),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
@@ -415,7 +422,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                                 child: CircularProgressIndicator(strokeWidth: 2),
                               )
                             : const Icon(Icons.table_chart),
-                        label: const Text('Export Excel'),
+                        label: Text(AppLocalizations.of(context)!.exportExcel),
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
@@ -487,7 +494,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Account Balance',
+                                  AppLocalizations.of(context)!.accountBalance,
                                   style: theme.textTheme.bodySmall?.copyWith(
                                     fontSize: 12,
                                     color: theme.textTheme.bodyMedium?.color?.withOpacity(0.7),
@@ -515,7 +522,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                             Expanded(
                               child: _buildSummaryItem(
                                 context,
-                                'Income',
+                                AppLocalizations.of(context)!.income,
                                 totalIncome,
                                 Colors.green,
                                 Icons.arrow_downward,
@@ -529,7 +536,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                             Expanded(
                               child: _buildSummaryItem(
                                 context,
-                                'Expense',
+                                AppLocalizations.of(context)!.expense,
                                 totalExpense,
                                 Colors.red,
                                 Icons.arrow_upward,
@@ -543,7 +550,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                             Expanded(
                               child: _buildSummaryItem(
                                 context,
-                                'Net',
+                                AppLocalizations.of(context)!.net,
                                 netAmount,
                                 netAmount >= 0 ? Colors.blue : Colors.orange,
                                 Icons.trending_up,
@@ -571,7 +578,7 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Select an account to view statement',
+                          AppLocalizations.of(context)!.selectAccountToViewStatement,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
                           ),
@@ -591,14 +598,14 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
                             ),
                             const SizedBox(height: 16),
                             Text(
-                              'No transactions found',
+                              AppLocalizations.of(context)!.noTransactionsFound,
                               style: theme.textTheme.titleMedium?.copyWith(
                                 color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
                               ),
                             ),
                             const SizedBox(height: 8),
                             Text(
-                              'for the selected date range',
+                              AppLocalizations.of(context)!.forSelectedDateRange,
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
                               ),
@@ -664,28 +671,26 @@ class _AccountStatementScreenState extends State<AccountStatementScreen> {
     final accountProvider = context.read<AccountProvider>();
     final contactProvider = context.read<ContactProvider>();
 
-    final accountName = transaction.accountId != null
-        ? accountProvider.getAccountById(transaction.accountId)?.name ?? 'N/A'
-        : 'N/A';
     final contactName = transaction.contactId != null
         ? contactProvider.getContactById(transaction.contactId)?.name ?? 'N/A'
         : 'N/A';
 
+    final l10n = AppLocalizations.of(context);
     Color amountColor;
     IconData typeIcon;
     String typeLabel;
     if (transaction.type == 'income') {
       amountColor = Colors.green;
       typeIcon = Icons.arrow_downward;
-      typeLabel = 'Income';
+      typeLabel = l10n?.income ?? 'Income';
     } else if (transaction.type == 'expense') {
       amountColor = Colors.red;
       typeIcon = Icons.arrow_upward;
-      typeLabel = 'Expense';
+      typeLabel = l10n?.expense ?? 'Expense';
     } else {
       amountColor = Colors.blue;
       typeIcon = Icons.swap_horiz;
-      typeLabel = 'Transfer';
+      typeLabel = l10n?.transfer ?? 'Transfer';
     }
 
     String dateDisplay = transaction.date;

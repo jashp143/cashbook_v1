@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mycashbook2/l10n/app_localizations.dart';
 import '../../providers/account_provider.dart';
 import '../../database/models/account.dart';
 
@@ -21,20 +23,21 @@ class _AccountListScreenState extends State<AccountListScreen> {
   }
 
   Future<void> _deleteAccount(BuildContext context, Account account) async {
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: Text('Are you sure you want to delete "${account.name}"?'),
+        title: Text(l10n.deleteAccount),
+        content: Text(l10n.deleteAccountConfirmation(account.name)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             style: TextButton.styleFrom(foregroundColor: Colors.red),
-            child: const Text('Delete'),
+            child: Text(l10n.delete),
           ),
         ],
       ),
@@ -44,14 +47,16 @@ class _AccountListScreenState extends State<AccountListScreen> {
       try {
         await context.read<AccountProvider>().deleteAccount(account.id!);
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Account deleted')),
+          Fluttertoast.showToast(
+            msg: l10n.accountDeleted,
+            toastLength: Toast.LENGTH_SHORT,
           );
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: $e')),
+          Fluttertoast.showToast(
+            msg: l10n.error(e.toString()),
+            toastLength: Toast.LENGTH_SHORT,
           );
         }
       }
@@ -70,15 +75,15 @@ class _AccountListScreenState extends State<AccountListScreen> {
       },
       child: Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Accounts',
-          style: TextStyle(fontWeight: FontWeight.bold),
+        title: Text(
+          AppLocalizations.of(context)!.accounts,
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.description),
-            tooltip: 'Account Statement',
+            tooltip: AppLocalizations.of(context)!.accountStatement,
             onPressed: () => context.go('/account-statement'),
           ),
         ],
@@ -101,7 +106,7 @@ class _AccountListScreenState extends State<AccountListScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'No accounts found',
+                    AppLocalizations.of(context)!.noAccountsFound,
                     style: theme.textTheme.titleMedium?.copyWith(
                       color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
                     ),
@@ -110,7 +115,7 @@ class _AccountListScreenState extends State<AccountListScreen> {
                   TextButton.icon(
                     onPressed: () => context.go('/accounts/new'),
                     icon: const Icon(Icons.add),
-                    label: const Text('Add Account'),
+                    label: Text(AppLocalizations.of(context)!.addAccount),
                   ),
                 ],
               ),
@@ -195,11 +200,11 @@ class _AccountListScreenState extends State<AccountListScreen> {
                             icon: const Icon(Icons.more_vert),
                             itemBuilder: (context) => [
                               PopupMenuItem(
-                                child: const Row(
+                                child: Row(
                                   children: [
-                                    Icon(Icons.edit, size: 20),
-                                    SizedBox(width: 8),
-                                    Text('Edit'),
+                                    const Icon(Icons.edit, size: 20),
+                                    const SizedBox(width: 8),
+                                    Text(AppLocalizations.of(context)!.edit),
                                   ],
                                 ),
                                 onTap: () => Future.delayed(
@@ -208,11 +213,14 @@ class _AccountListScreenState extends State<AccountListScreen> {
                                 ),
                               ),
                               PopupMenuItem(
-                                child: const Row(
+                                child: Row(
                                   children: [
-                                    Icon(Icons.delete, size: 20, color: Colors.red),
-                                    SizedBox(width: 8),
-                                    Text('Delete', style: TextStyle(color: Colors.red)),
+                                    const Icon(Icons.delete, size: 20, color: Colors.red),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      AppLocalizations.of(context)!.delete,
+                                      style: const TextStyle(color: Colors.red),
+                                    ),
                                   ],
                                 ),
                                 onTap: () => Future.delayed(
@@ -235,7 +243,7 @@ class _AccountListScreenState extends State<AccountListScreen> {
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.go('/accounts/new'),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Add Account'),
+        label: Text(AppLocalizations.of(context)!.addAccount),
       ),
       ),
     );

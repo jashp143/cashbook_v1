@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
-import '../providers/theme_provider.dart';
 import 'bottom_nav_bar.dart';
 
 class MainScaffold extends StatelessWidget {

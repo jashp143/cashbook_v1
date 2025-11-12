@@ -289,8 +289,7 @@ class PDFExport {
                   (a) => a.id == transaction.accountId,
                   orElse: () => accounts.first,
                 )
-                .name ??
-            'N/A'
+                .name
         : 'N/A';
     final contactName = transaction.contactId != null &&
             contacts != null &&
@@ -300,8 +299,7 @@ class PDFExport {
                   (c) => c.id == transaction.contactId,
                   orElse: () => contacts.first,
                 )
-                .name ??
-            'N/A'
+                .name
         : 'N/A';
 
     // Format date

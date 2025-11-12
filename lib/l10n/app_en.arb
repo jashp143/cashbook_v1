@@ -1,0 +1,267 @@
+{
+  "@@locale": "en",
+  "appTitle": "Khata Vahi",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "home": "Home",
+  "reports": "Reports",
+  "accounts": "Accounts",
+  "contacts": "Contacts",
+  "settings": "Settings",
+  "currentBalance": "Current Balance",
+  "income": "Income",
+  "expense": "Expense",
+  "transfer": "Transfer",
+  "allAccounts": "All Accounts",
+  "noTransactionsYet": "No transactions yet",
+  "addYourFirstTransaction": "Add your first transaction",
+  "today": "Today",
+  "yesterday": "Yesterday",
+  "deleteTransaction": "Delete Transaction",
+  "deleteTransactionConfirmation": "Are you sure you want to delete this {type} transaction of ₹{amount}?",
+  "@deleteTransactionConfirmation": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "cancel": "Cancel",
+  "delete": "Delete",
+  "transactionDeletedSuccessfully": "Transaction deleted successfully",
+  "errorDeletingTransaction": "Error deleting transaction: {error}",
+  "@errorDeletingTransaction": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "edit": "Edit",
+  "date": "Date",
+  "account": "Account",
+  "fromAccount": "From Account",
+  "toAccount": "To Account",
+  "contact": "Contact",
+  "billNumber": "Bill Number",
+  "company": "Company",
+  "remark": "Remark",
+  "shareViaWhatsApp": "Share via WhatsApp",
+  "couldNotOpenWhatsApp": "Could not open WhatsApp. Please make sure WhatsApp is installed.",
+  "chooseHowToShare": "Choose how to share:",
+  "withPhoneNumber": "With Phone Number",
+  "withoutPhoneNumber": "Without Phone Number",
+  "phone": "Phone",
+  "theme": "Theme",
+  "systemTheme": "System Theme",
+  "lightMode": "Light Mode",
+  "darkMode": "Dark Mode",
+  "language": "Language",
+  "english": "English",
+  "hindi": "Hindi",
+  "gujarati": "Gujarati",
+  "incomeLabel": "INCOME",
+  "expenseLabel": "EXPENSE",
+  "transferLabel": "TRANSFER",
+  "accountStatement": "Account Statement",
+  "selectAccount": "Select Account",
+  "startDate": "Start Date",
+  "endDate": "End Date",
+  "selectDate": "Select date",
+  "exportPDF": "Export PDF",
+  "exportExcel": "Export Excel",
+  "pleaseSelectAccountAndDateRange": "Please select account and date range",
+  "pdfExportedSuccessfully": "PDF exported successfully",
+  "errorExportingPDF": "Error exporting PDF: {error}",
+  "@errorExportingPDF": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "excelExportedSuccessfully": "Excel exported successfully",
+  "errorExportingExcel": "Error exporting Excel: {error}",
+  "@errorExportingExcel": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "accountBalance": "Account Balance",
+  "net": "Net",
+  "selectAccountToViewStatement": "Select an account to view statement",
+  "noTransactionsFound": "No transactions found",
+  "forSelectedDateRange": "for the selected date range",
+  "newAccount": "New Account",
+  "editAccount": "Edit Account",
+  "accountName": "Account Name",
+  "pleaseEnterAccountName": "Please enter account name",
+  "accountNumberOptional": "Account Number (Optional)",
+  "noteOptional": "Note (Optional)",
+  "saveAccount": "Save Account",
+  "accountCreated": "Account created",
+  "accountUpdated": "Account updated",
+  "error": "Error: {error}",
+  "@error": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noAccountsFound": "No accounts found",
+  "addAccount": "Add Account",
+  "deleteAccount": "Delete Account",
+  "deleteAccountConfirmation": "Are you sure you want to delete \"{accountName}\"?",
+  "@deleteAccountConfirmation": {
+    "placeholders": {
+      "accountName": {
+        "type": "String"
+      }
+    }
+  },
+  "accountDeleted": "Account deleted",
+  "newContact": "New Contact",
+  "editContact": "Edit Contact",
+  "name": "Name",
+  "pleaseEnterName": "Please enter name",
+  "phoneOptional": "Phone (Optional)",
+  "emailOptional": "Email (Optional)",
+  "importFromDevice": "Import from Device",
+  "saveContact": "Save Contact",
+  "contactCreated": "Contact created",
+  "contactUpdated": "Contact updated",
+  "contactPermissionRequired": "Contact permission is required to import contacts",
+  "noContactsFoundOnDevice": "No contacts found on device",
+  "selectContact": "Select Contact",
+  "errorImportingContact": "Error importing contact: {error}",
+  "@errorImportingContact": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "noContactsFound": "No contacts found",
+  "addContact": "Add Contact",
+  "deleteContact": "Delete Contact",
+  "deleteContactConfirmation": "Are you sure you want to delete \"{contactName}\"?",
+  "@deleteContactConfirmation": {
+    "placeholders": {
+      "contactName": {
+        "type": "String"
+      }
+    }
+  },
+  "contactDeleted": "Contact deleted",
+  "amount": "Amount",
+  "addExpense": "Add Expense",
+  "editExpense": "Edit Expense",
+  "expenseAccountNote": "The selected account will be debited for the expense",
+  "expenseContactNote": "To which contact you paid the expense. If not, select None",
+  "pleaseSelectAnAccount": "Please select an account",
+  "billNumberOptional": "Bill Number (Optional)",
+  "companyNameOptional": "Company Name (Optional)",
+  "remarkOptional": "Remark (Optional)",
+  "updateExpense": "Update Expense",
+  "saveExpense": "Save Expense",
+  "expenseUpdatedSuccessfully": "Expense updated successfully",
+  "expenseAddedSuccessfully": "Expense added successfully",
+  "addIncome": "Add Income",
+  "editIncome": "Edit Income",
+  "incomeAccountNote": "The selected account will receive the income",
+  "incomeContactNote": "From which contact you received income. If not, select None",
+  "updateIncome": "Update Income",
+  "saveIncome": "Save Income",
+  "incomeUpdatedSuccessfully": "Income updated successfully",
+  "incomeAddedSuccessfully": "Income added successfully",
+  "editTransfer": "Edit Transfer",
+  "pleaseSelectBothAccounts": "Please select both accounts",
+  "fromAndToAccountsMustBeDifferent": "From and To accounts must be different",
+  "pleaseSelectFromAccount": "Please select from account",
+  "pleaseSelectToAccount": "Please select to account",
+  "noteOptional": "Note (Optional)",
+  "updateTransfer": "Update Transfer",
+  "completeTransfer": "Complete Transfer",
+  "transferUpdatedSuccessfully": "Transfer updated successfully",
+  "transferCompletedSuccessfully": "Transfer completed successfully",
+  "withPhoneNumberDescription": "• With phone number: Opens chat directly (if number is on WhatsApp)",
+  "withoutPhoneNumberDescription": "• Without phone number: Opens WhatsApp, you can select the contact",
+  "filters": "Filters",
+  "timeline": "Timeline",
+  "calendar": "Calendar",
+  "allContacts": "All Contacts",
+  "thisWeek": "This Week",
+  "thisMonth": "This Month",
+  "allTime": "All Time",
+  "transactionReport": "Transaction Report",
+  "hideCalendar": "Hide Calendar",
+  "showCalendar": "Show Calendar",
+  "noTransactions": "No transactions",
+  "noTransactionsOnDate": "No transactions on {date}",
+  "@noTransactionsOnDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "transactionCount": "{count} transaction",
+  "@transactionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "transactionCountPlural": "{count} transactions",
+  "@transactionCountPlural": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "netLabel": "Net: ₹{amount}",
+  "@netLabel": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "transactionDetails": "Transaction Details",
+  "editTransaction": "Edit Transaction",
+  "whatsAppNotRegisteredMessage": "If WhatsApp says the number isn't registered, try sharing without phone number option.",
+  "receipts": "Receipts",
+  "addReceipt": "Add Receipt",
+  "noReceiptsAdded": "No receipts added",
+  "pickFromGallery": "Pick from Gallery",
+  "takePhoto": "Take Photo",
+  "pickPDFFile": "Pick PDF File",
+  "errorPickingImage": "Error picking image: {error}",
+  "@errorPickingImage": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "errorPickingPDF": "Error picking PDF: {error}",
+  "@errorPickingPDF": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "previewReceipt": "Preview Receipt",
+  "removeReceipt": "Remove Receipt"
+}
+

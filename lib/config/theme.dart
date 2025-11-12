@@ -7,9 +7,10 @@ class AppTheme {
   static const Color green = Color(0xFF4CAF50);
   static const Color red = Color(0xFFF44336);
 
-  static ThemeData get lightTheme {
+  static ThemeData getLightTheme([String fontFamily = 'NotoSans']) {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: fontFamily,
       colorScheme: ColorScheme.fromSeed(
         seedColor: black,
         primary: black,
@@ -26,22 +27,22 @@ class AppTheme {
       cardColor: white,
       dividerColor: black,
       iconTheme: const IconThemeData(color: black),
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(color: black),
-        displayMedium: TextStyle(color: black),
-        displaySmall: TextStyle(color: black),
-        headlineLarge: TextStyle(color: black),
-        headlineMedium: TextStyle(color: black),
-        headlineSmall: TextStyle(color: black),
-        titleLarge: TextStyle(color: black),
-        titleMedium: TextStyle(color: black),
-        titleSmall: TextStyle(color: black),
-        bodyLarge: TextStyle(color: black),
-        bodyMedium: TextStyle(color: black),
-        bodySmall: TextStyle(color: black),
-        labelLarge: TextStyle(color: black),
-        labelMedium: TextStyle(color: black),
-        labelSmall: TextStyle(color: black),
+      textTheme: TextTheme(
+        displayLarge: TextStyle(color: black, fontFamily: fontFamily),
+        displayMedium: TextStyle(color: black, fontFamily: fontFamily),
+        displaySmall: TextStyle(color: black, fontFamily: fontFamily),
+        headlineLarge: TextStyle(color: black, fontFamily: fontFamily),
+        headlineMedium: TextStyle(color: black, fontFamily: fontFamily),
+        headlineSmall: TextStyle(color: black, fontFamily: fontFamily),
+        titleLarge: TextStyle(color: black, fontFamily: fontFamily),
+        titleMedium: TextStyle(color: black, fontFamily: fontFamily),
+        titleSmall: TextStyle(color: black, fontFamily: fontFamily),
+        bodyLarge: TextStyle(color: black, fontFamily: fontFamily),
+        bodyMedium: TextStyle(color: black, fontFamily: fontFamily),
+        bodySmall: TextStyle(color: black, fontFamily: fontFamily),
+        labelLarge: TextStyle(color: black, fontFamily: fontFamily),
+        labelMedium: TextStyle(color: black, fontFamily: fontFamily),
+        labelSmall: TextStyle(color: black, fontFamily: fontFamily),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: white,
@@ -87,9 +88,10 @@ class AppTheme {
     );
   }
 
-  static ThemeData get darkTheme {
+  static ThemeData getDarkTheme([String fontFamily = 'NotoSans']) {
     return ThemeData(
       useMaterial3: true,
+      fontFamily: fontFamily,
       colorScheme: ColorScheme.fromSeed(
         seedColor: white,
         primary: white,
@@ -106,22 +108,22 @@ class AppTheme {
       cardColor: black,
       dividerColor: white,
       iconTheme: const IconThemeData(color: white),
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(color: white),
-        displayMedium: TextStyle(color: white),
-        displaySmall: TextStyle(color: white),
-        headlineLarge: TextStyle(color: white),
-        headlineMedium: TextStyle(color: white),
-        headlineSmall: TextStyle(color: white),
-        titleLarge: TextStyle(color: white),
-        titleMedium: TextStyle(color: white),
-        titleSmall: TextStyle(color: white),
-        bodyLarge: TextStyle(color: white),
-        bodyMedium: TextStyle(color: white),
-        bodySmall: TextStyle(color: white),
-        labelLarge: TextStyle(color: white),
-        labelMedium: TextStyle(color: white),
-        labelSmall: TextStyle(color: white),
+      textTheme: TextTheme(
+        displayLarge: TextStyle(color: white, fontFamily: fontFamily),
+        displayMedium: TextStyle(color: white, fontFamily: fontFamily),
+        displaySmall: TextStyle(color: white, fontFamily: fontFamily),
+        headlineLarge: TextStyle(color: white, fontFamily: fontFamily),
+        headlineMedium: TextStyle(color: white, fontFamily: fontFamily),
+        headlineSmall: TextStyle(color: white, fontFamily: fontFamily),
+        titleLarge: TextStyle(color: white, fontFamily: fontFamily),
+        titleMedium: TextStyle(color: white, fontFamily: fontFamily),
+        titleSmall: TextStyle(color: white, fontFamily: fontFamily),
+        bodyLarge: TextStyle(color: white, fontFamily: fontFamily),
+        bodyMedium: TextStyle(color: white, fontFamily: fontFamily),
+        bodySmall: TextStyle(color: white, fontFamily: fontFamily),
+        labelLarge: TextStyle(color: white, fontFamily: fontFamily),
+        labelMedium: TextStyle(color: white, fontFamily: fontFamily),
+        labelSmall: TextStyle(color: white, fontFamily: fontFamily),
       ),
       appBarTheme: const AppBarTheme(
         backgroundColor: black,

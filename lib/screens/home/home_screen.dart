@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:mycashbook2/l10n/app_localizations.dart';
 import '../../providers/transaction_provider.dart';
 import '../../providers/account_provider.dart';
 import '../../providers/contact_provider.dart';
@@ -69,6 +71,82 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  void _editTransaction(BuildContext context, Transaction transaction) {
+    // Navigate to the appropriate form screen based on transaction type
+    String route;
+    if (transaction.type == 'income') {
+      route = '/income';
+    } else if (transaction.type == 'expense') {
+      route = '/expense';
+    } else {
+      route = '/transfer';
+    }
+    
+    // Navigate with transaction as extra data for editing
+    context.go(route, extra: transaction);
+  }
+
+  Future<void> _deleteTransaction(
+    BuildContext context,
+    Transaction transaction,
+    TransactionProvider transactionProvider,
+  ) async {
+      // Show confirmation dialog
+      final l10n = AppLocalizations.of(context)!;
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text(l10n.deleteTransaction),
+          content: Text(
+            l10n.deleteTransactionConfirmation(transaction.type, transaction.amount.toStringAsFixed(0)),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(l10n.cancel),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.red,
+              ),
+              child: Text(l10n.delete),
+            ),
+          ],
+        ),
+      );
+
+    if (confirmed == true && transaction.id != null) {
+      try {
+        final accountProvider = context.read<AccountProvider>();
+        
+        await transactionProvider.deleteTransaction(
+          transaction.id!,
+          accountProvider,
+        );
+
+        if (mounted) {
+          // Remove from expanded set if it was expanded
+          setState(() {
+            _expandedTransactions.remove(transaction.id);
+          });
+          
+          Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.transactionDeletedSuccessfully,
+            toastLength: Toast.LENGTH_SHORT,
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          Fluttertoast.showToast(
+            msg: AppLocalizations.of(context)!.errorDeletingTransaction(e.toString()),
+            toastLength: Toast.LENGTH_SHORT,
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -85,13 +163,14 @@ class _HomeScreenState extends State<HomeScreen> {
           builder: (context, accountProvider, child) {
             // Always rebuild when accountProvider changes - capture values immediately
             final selectedAccountId = accountProvider.selectedAccountId;
+            final l10n = AppLocalizations.of(context)!;
             final selectedAccountName = (accountProvider.selectedAccountId == null || accountProvider.selectedAccountId == -1)
-                ? 'All Accounts' 
-                : (accountProvider.selectedAccount?.name ?? 'All Accounts');
+                ? l10n.allAccounts 
+                : (accountProvider.selectedAccount?.name ?? l10n.allAccounts);
             
             if (accountProvider.accounts.isEmpty) {
               return Text(
-                'Khata Vahi',
+                l10n.appTitle,
                 style: TextStyle(fontWeight: FontWeight.bold),
                 key: ValueKey('cashbook-empty'),
               );
@@ -130,7 +209,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'All Accounts',
+                          AppLocalizations.of(context)!.allAccounts,
                           style: (currentSelectedId == null || currentSelectedId == -1)
                               ? TextStyle(
                                   fontWeight: FontWeight.bold,
@@ -213,7 +292,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     // Current Balance Title (Centered)
                     Text(
-                      'Current Balance',
+                      AppLocalizations.of(context)!.currentBalance,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.textTheme.bodyMedium?.color,
                         fontSize: 12,
@@ -248,7 +327,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    'Income',
+                                    AppLocalizations.of(context)!.income,
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: Colors.green,
                                       fontSize: 12,
@@ -289,7 +368,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    'Expense',
+                                    AppLocalizations.of(context)!.expense,
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: Colors.red,
                                       fontSize: 12,
@@ -318,7 +397,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                           child: _buildActionButton(
                             context,
-                            label: 'Income',
+                            label: AppLocalizations.of(context)!.income,
                             icon: Icons.add_rounded,
                             color: Colors.green,
                             onTap: () => context.go('/income'),
@@ -328,7 +407,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                           child: _buildActionButton(
                             context,
-                            label: 'Expense',
+                            label: AppLocalizations.of(context)!.expense,
                             icon: Icons.remove_rounded,
                             color: Colors.red,
                             onTap: () => context.go('/expense'),
@@ -338,7 +417,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         Expanded(
                           child: _buildActionButton(
                             context,
-                            label: 'Transfer',
+                            label: AppLocalizations.of(context)!.transfer,
                             icon: Icons.swap_horiz_rounded,
                             color: Colors.blue,
                             onTap: () => context.go('/transfer'),
@@ -372,14 +451,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'No transactions yet',
+                          AppLocalizations.of(context)!.noTransactionsYet,
                           style: theme.textTheme.titleMedium?.copyWith(
                             color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
                           ),
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Add your first transaction',
+                          AppLocalizations.of(context)!.addYourFirstTransaction,
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: theme.textTheme.bodyMedium?.color?.withOpacity(0.5),
                           ),
@@ -424,7 +503,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                               const SizedBox(width: 8),
                               Text(
-                                _formatDate(date),
+                                _formatDate(context, date),
                                 style: theme.textTheme.bodySmall?.copyWith(
                                   fontWeight: FontWeight.w500,
                                   color: theme.textTheme.bodyMedium?.color?.withOpacity(0.6),
@@ -517,18 +596,19 @@ class _HomeScreenState extends State<HomeScreen> {
     Color amountColor;
     IconData typeIcon;
     String typeLabel;
+    final l10n = AppLocalizations.of(context);
     if (transaction.type == 'income') {
       amountColor = Colors.green;
       typeIcon = Icons.arrow_downward_rounded;
-      typeLabel = 'INCOME';
+      typeLabel = l10n?.incomeLabel ?? 'INCOME';
     } else if (transaction.type == 'expense') {
       amountColor = Colors.red;
       typeIcon = Icons.arrow_upward_rounded;
-      typeLabel = 'EXPENSE';
+      typeLabel = l10n?.expenseLabel ?? 'EXPENSE';
     } else {
       amountColor = Colors.blue;
       typeIcon = Icons.swap_horiz_rounded;
-      typeLabel = 'TRANSFER';
+      typeLabel = l10n?.transferLabel ?? 'TRANSFER';
     }
 
     final theme = Theme.of(context);
@@ -637,7 +717,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _buildDetailRow(
                         context,
                         icon: Icons.calendar_today_rounded,
-                        label: 'Date',
+                        label: AppLocalizations.of(context)!.date,
                         value: formattedDate,
                       ),
                       if (accountName != 'N/A') ...[
@@ -647,7 +727,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           icon: transaction.type == 'transfer' 
                               ? Icons.account_balance_wallet_rounded 
                               : Icons.account_balance_wallet_rounded,
-                          label: transaction.type == 'transfer' ? 'From Account' : 'Account',
+                          label: transaction.type == 'transfer' 
+                              ? AppLocalizations.of(context)!.fromAccount 
+                              : AppLocalizations.of(context)!.account,
                           value: accountName,
                         ),
                       ],
@@ -656,7 +738,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildDetailRow(
                           context,
                           icon: Icons.account_balance_wallet_outlined,
-                          label: 'To Account',
+                          label: AppLocalizations.of(context)!.toAccount,
                           value: secondAccountName,
                         ),
                       ],
@@ -665,7 +747,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildDetailRow(
                           context,
                           icon: Icons.person_rounded,
-                          label: 'Contact',
+                          label: AppLocalizations.of(context)!.contact,
                           value: contactName,
                         ),
                       ],
@@ -674,7 +756,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildDetailRow(
                           context,
                           icon: Icons.receipt_rounded,
-                          label: 'Bill Number',
+                          label: AppLocalizations.of(context)!.billNumber,
                           value: transaction.billNumber!,
                         ),
                       ],
@@ -683,7 +765,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildDetailRow(
                           context,
                           icon: Icons.business_rounded,
-                          label: 'Company',
+                          label: AppLocalizations.of(context)!.company,
                           value: transaction.companyName!,
                         ),
                       ],
@@ -692,11 +774,50 @@ class _HomeScreenState extends State<HomeScreen> {
                         _buildDetailRow(
                           context,
                           icon: Icons.note_rounded,
-                          label: 'Remark',
+                          label: AppLocalizations.of(context)!.remark,
                           value: transaction.remark!,
                           isMultiline: true,
                         ),
                       ],
+                      const SizedBox(height: 16),
+                      // Action Buttons (Edit and Delete)
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _editTransaction(context, transaction),
+                                icon: const Icon(Icons.edit, size: 16),
+                                label: Text(AppLocalizations.of(context)!.edit, style: const TextStyle(fontSize: 12)),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                minimumSize: const Size(0, 40),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: () => _deleteTransaction(context, transaction, transactionProvider),
+                                icon: const Icon(Icons.delete, size: 16),
+                                label: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(fontSize: 12)),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Colors.red,
+                                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                                minimumSize: const Size(0, 40),
+                                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                       const SizedBox(height: 12),
                       // WhatsApp Share Button
                       _buildWhatsAppShareButton(
@@ -775,7 +896,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  String _formatDate(String dateString) {
+  String _formatDate(BuildContext context, String dateString) {
     try {
       final date = DateFormat('yyyy-MM-dd').parse(dateString);
       final now = DateTime.now();
@@ -783,10 +904,11 @@ class _HomeScreenState extends State<HomeScreen> {
       final yesterday = today.subtract(const Duration(days: 1));
       final dateOnly = DateTime(date.year, date.month, date.day);
 
+      final l10n = AppLocalizations.of(context);
       if (dateOnly == today) {
-        return 'Today';
+        return l10n?.today ?? 'Today';
       } else if (dateOnly == yesterday) {
-        return 'Yesterday';
+        return l10n?.yesterday ?? 'Yesterday';
       } else {
         return DateFormat('MMM dd, yyyy').format(date);
       }
@@ -831,7 +953,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 6),
             Text(
-              'Share via WhatsApp',
+              AppLocalizations.of(context)!.shareViaWhatsApp,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     color: const Color(0xFF25D366),
                     fontWeight: FontWeight.w600,
@@ -861,48 +983,49 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // If phone number exists, ask user how they want to share
     if (phoneNumber != null && phoneNumber.isNotEmpty) {
+      final l10n = AppLocalizations.of(context)!;
       final shareOption = await showDialog<String>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Share via WhatsApp'),
+          title: Text(l10n.shareViaWhatsApp),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (contactName != null) ...[
-                Text('Contact: $contactName'),
+                Text('${l10n.contact}: $contactName'),
                 const SizedBox(height: 8),
               ],
-              Text('Phone: $phoneNumber'),
+              Text('${l10n.phone}: $phoneNumber'),
               const SizedBox(height: 16),
-              const Text(
-                'Choose how to share:',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              Text(
+                l10n.chooseHowToShare,
+                style: const TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text(
-                '• With phone number: Opens chat directly (if number is on WhatsApp)',
-                style: TextStyle(fontSize: 12),
+              Text(
+                l10n.withPhoneNumberDescription,
+                style: const TextStyle(fontSize: 12),
               ),
               const SizedBox(height: 4),
-              const Text(
-                '• Without phone number: Opens WhatsApp, you can select the contact',
-                style: TextStyle(fontSize: 12),
+              Text(
+                l10n.withoutPhoneNumberDescription,
+                style: const TextStyle(fontSize: 12),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop('with_number'),
-              child: const Text('With Phone Number'),
+              child: Text(l10n.withPhoneNumber),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop('without_number'),
-              child: const Text('Without Phone Number'),
+              child: Text(l10n.withoutPhoneNumber),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(null),
-              child: const Text('Cancel'),
+              child: Text(l10n.cancel),
             ),
           ],
         ),
@@ -925,11 +1048,9 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (!success && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Could not open WhatsApp. Please make sure WhatsApp is installed.'),
-          duration: Duration(seconds: 2),
-        ),
+      Fluttertoast.showToast(
+        msg: AppLocalizations.of(context)!.couldNotOpenWhatsApp,
+        toastLength: Toast.LENGTH_SHORT,
       );
     }
   }
